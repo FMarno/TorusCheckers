@@ -24,9 +24,9 @@ data State = State {
 }
 
 data GameTree = GameTree {
-                    game_board :: Board,
-                    game_turn :: Colour,
-                    next_moves :: [(Position, GameTree)]
+										game_board :: Board,
+										game_turn :: Colour,
+										next_moves :: [(Position, GameTree)]
 }
 --------------------------------------------------
 
@@ -37,8 +37,15 @@ positionsOfColour colour board = map fst $ filter (\x -> snd x == colour) (piece
 possibleMoves :: Colour -> Position -> Board -> [Position]
 possibleMoves = undefined
 
-movePiece :: Position -> Position -> Board -> Board
-movePiece = undefined
+addPiece :: Colour -> Position -> Board -> Board
+addPiece c p (Board s ps n) = Board s ((p,c) : ps) n
+
+removePiece :: Position -> Board -> Board
+removePiece p (Board s ps n) = Board s (rP p ps) n
+ 																where
+																	rP :: Position -> [(Position, Colour)] -> [(Position, Colour)]
+																	rP _ [] = []
+																	rP p (x:xs) = if fst x == p then xs else x:(rP p xs)
 
 evaluateBoard :: Colour -> Board -> Int
 evaluateBoard = undefined
@@ -52,7 +59,7 @@ initialBoard = Board 8 ([((x+(y `mod` 2),y),White) | x <- [0,2,4,6], y <- [0,1,2
 --------------------------------------------------
 printBoard :: Board -> String
 printBoard board =
-	concat $  concat $ reverse $ intersperse ["\n"] $ breakUp (size board)
+	concat $	concat $ reverse $ intersperse ["\n"] $ breakUp (size board)
 	$ (map (\x -> colourAt (pieces board) x)
 	[(y,x)| x<-[0..(size board)-1], y<-[0..(size board)-1]])
 
@@ -60,16 +67,16 @@ colourAt :: [(Position, Colour)] -> Position -> String
 colourAt pieces position
 		| isPosition position White pieces 	= "|W|"
 		| isPosition position Red pieces 	= "|R|"
-		| otherwise						    = "| |"
+		| otherwise								= "| |"
 
 isPosition :: (Int, Int) -> Colour -> [(Position, Colour)] -> Bool
 isPosition _ _ [] = False
 isPosition position colour (piece:pieces) =
-  equalPosition position colour piece || isPosition position colour pieces
+	equalPosition position colour piece || isPosition position colour pieces
 
 equalPosition :: (Int, Int) -> Colour -> (Position, Colour) -> Bool
 equalPosition position1 colour1 (position2, colour2) =
-  position1 == position2 && colour1 == colour2
+	position1 == position2 && colour1 == colour2
 
 breakUp :: Int -> [a] -> [[a]]
 breakUp l [] = [[]]
