@@ -34,32 +34,45 @@ positionsOfColour :: Colour -> Board -> [Position]
 positionsOfColour Non board = []
 positionsOfColour colour board = map fst $ filter (\x -> snd x == colour) (pieces board)
 
-possibleMoves :: Colour -> Position -> Board -> [Position]
-possibleMoves = undefined
+possibleMoves :: Colour -> Position -> Board -> Bool -> [[Position]]
+possibleMoves White p b@(Board s ps n) singlemoves =
+											if singlemoves then singles else []-- ++ jumps
+												where
+													singles :: [[Position]]
+													singles = [[x,y] | x <- [(fst p) +1,(fst p) -1 ] , y <- [(snd p) -1]]
+
+movePiece :: Colour -> Position -> Board -> [Position] -> Board
+movePiece = undefined
 
 addPiece :: Colour -> Position -> Board -> Board
 addPiece c p (Board s ps n) = Board s ((p,c) : ps) n
 
 removePiece :: Position -> Board -> Board
 removePiece p (Board s ps n) = Board s (rP p ps) n
- 																where
-																	rP :: Position -> [(Position, Colour)] -> [(Position, Colour)]
-																	rP _ [] = []
-																	rP p (x:xs) = if fst x == p then xs else x:(rP p xs)
+									where
+										rP :: Position -> [(Position, Colour)] -> [(Position, Colour)]
+										rP _ [] = []
+										rP p (x:xs) = if fst x == p then xs else x:(rP p xs)
+
+isColourAt :: Colour -> Position -> Board -> Bool
+isColourAt c p (Board s ps n) = elem (p,c) ps
 
 evaluateBoard :: Colour -> Board -> Int
-evaluateBoard = undefined
+evaluateBoard c (Board s ps n) = numberOfPieces Red - numberOfPieces White
+						where
+							numberOfPieces :: Colour -> Int
+							numberOfPieces colour = length $ filter (\x -> snd x == colour) ps
 
 --------------------------------------------------
 
 initialBoard :: Board
-initialBoard = Board 8 ([((x+(y `mod` 2),y),White) | x <- [0,2,4,6], y <- [0,1,2]] ++
-						[(((if y==7 || y ==5 then x else x-1),y),Red) | x<-[1,3,5,7] , y <- [5,6,7]]) 0
+initialBoard = Board 8 ([((x+(y `mod` 2),y),Red) | x <- [0,2,4,6], y <- [0,1,2]] ++
+						[(((if y==7 || y ==5 then x else x-1),y),White) | x<-[1,3,5,7] , y <- [5,6,7]]) 0
 
 --------------------------------------------------
 printBoard :: Board -> String
 printBoard board =
-	concat $	concat $ reverse $ intersperse ["\n"] $ breakUp (size board)
+	concat $ concat $ intersperse ["\n"] $ breakUp (size board)
 	$ (map (\x -> colourAt (pieces board) x)
 	[(y,x)| x<-[0..(size board)-1], y<-[0..(size board)-1]])
 
