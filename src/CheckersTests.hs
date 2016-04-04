@@ -15,7 +15,12 @@ tests = TestList $ map TestCase [
     assertEqual "torus from White 21" [20,17] (steps White 21 8),
     assertEqual "torus from White 20" [16,13] (steps White 20 8),
     assertEqual "torus from White 4" [32,29] (steps White 4 8),
-    assertEqual "torus from White 1" [29,30] (steps White 1 8)
+    assertEqual "torus from White 1" [29,30] (steps White 1 8),
+
+    assertEqual "torus from White 1" [29,30] (steps White 1 8),
+    assertEqual "torus from White 1" [29,30] (steps White 1 8),
+    assertEqual "torus from White 1" [29,30] (steps Red 1 8),
+    assertEqual "torus from White 1" [29,30] (steps Red 1 8)
     ]
 
 run :: IO Counts

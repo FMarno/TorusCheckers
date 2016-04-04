@@ -36,6 +36,17 @@ positionsOfColour colour board = map fst $ filter (\x -> snd x == colour) (piece
 possibleMoves :: Colour -> Position -> Board -> Bool -> [[Position]]
 possibleMoves Red pos (Board s ps n) singlemoves = undefined
 
+
+jumps :: Colour -> Position -> Int -> [Position]
+jumps colour pos size = flanks (twoForward col pos size) size
+
+flanks :: Position -> Int -> [Position]
+flanks pos size = [pos-1, pos+1]
+
+twoForward :: Colour -> Position -> Int -> Position
+twoForward Red pos size | pos > ((size^2)`div`2) - size =  pos + size
+twoForward White pos size = pos - size
+
 --find the two possible moves that are a space away
 steps :: Colour -> Position -> Int -> [Position]
 steps Red pos size
