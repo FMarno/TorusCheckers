@@ -1,4 +1,4 @@
-size = 8;
+size = parseInt(process.argv[2]);
 odd = true;
 
 for (var i = 0; i < size; i++) {
