@@ -10,9 +10,9 @@ for (var i = 0; i < size; i++) {
                 num = " " + num;
             }
             if (odd) {
-                process.stdout.write("|" + (num) + "||  |");
-            } else {
                 process.stdout.write("|  ||" + (num) + "|");
+            } else {
+                process.stdout.write("|" + (num) + "||  |");
             }
         }
     }
