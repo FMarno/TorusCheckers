@@ -6,10 +6,17 @@ import           Data.List
 
 type Position = Int
 
+type Turn = [Move]
+
 type Move = (Position, Position)
 
 data Colour = White | Red | Non
 	deriving (Eq, Show)
+
+otherColour :: Colour -> Colour
+otherColour White = Red
+otherColour Red = White
+otherColour Non = Non
 
 data Board = Board {
 					size :: Int,
@@ -33,10 +40,13 @@ positionsOfColour :: Colour -> Board -> [Position]
 positionsOfColour Non board = []
 positionsOfColour colour board = map fst $ filter (\x -> snd x == colour) (pieces board)
 
-possibleMoves :: Colour -> Position -> Board -> Bool -> [[Position]]
-possibleMoves col pos (Board s ps n) singlemoves 
-	| singlemoves = steps col pos s : []
-	| otherwise = []
+--possibleTurns :: Colour -> Position -> Board -> Bool -> [Turn]
+--possibleMoves col pos (Board s ps n) singlemoves 
+--	| singlemoves = breakUp 1 (steps col pos s) ++ possibleMoves col 
+--	| otherwise = []
+
+emptySpace :: Position -> Board -> Bool
+emptySpace pos (Board _ ps _ ) = not (pos `elem` (map fst ps))
 
 
 jumps :: Colour -> Position -> Int -> [Position]
