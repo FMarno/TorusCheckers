@@ -40,13 +40,19 @@ positionsOfColour :: Colour -> Board -> [Position]
 positionsOfColour Non board = []
 positionsOfColour colour board = map fst $ filter (\x -> snd x == colour) (pieces board)
 
+possibleTurns :: Colour -> Position -> Board -> [Turn]
+possibleTurns col pos board | not (null jumpTurns) = jumpTurns
+														| otherwise = singleTurns
+													where
+														jumpTurns = []
+														singleTurns = map (\x -> [(pos,x)]) $ filter (emptySpace board) $ steps col pos (size board)
 --possibleTurns :: Colour -> Position -> Board -> Bool -> [Turn]
---possibleMoves col pos (Board s ps n) singlemoves 
---	| singlemoves = breakUp 1 (steps col pos s) ++ possibleMoves col 
+--possibleMoves col pos (Board s ps n) singlemoves
+--	| singlemoves = breakUp 1 (steps col pos s) ++ possibleMoves col
 --	| otherwise = []
 
-emptySpace :: Position -> Board -> Bool
-emptySpace pos (Board _ ps _ ) = not (pos `elem` (map fst ps))
+emptySpace :: Board -> Position -> Bool
+emptySpace (Board _ ps _ ) pos = pos `notElem` map fst ps
 
 
 jumps :: Colour -> Position -> Int -> [Position]
