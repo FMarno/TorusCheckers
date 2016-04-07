@@ -1,6 +1,7 @@
 module TorusCheckers where
 
 import           Data.List
+import           Debug.Trace
 
 --Structures-------------------------------------
 
@@ -42,12 +43,25 @@ possibleTurns col pos b@(Board s ps n) | null jturns = singleTurns
 										singleTurns = breakUp 1 $ filter (emptySpace b) $ steps col pos s
 
 jumpTurns :: Colour -> Position -> Board -> [[Position]]
-jumpTurns col pos b@(Board s _ _) = undefined
+jumpTurns col pos b@(Board s ps _) | null  validJumps = [[pos]]
+ 																	| otherwise = map (pos:) $ concatMap (\x -> jumpTurns col x (removePiece (between pos x col s) $ removePiece pos b)) validJumps
+																		where
+																			validJumps = lJump ++ rJump
+																			lJump = [head possibleJumps | adjacentOpponent col pos b True && emptySpace b (head possibleJumps)]
+																			rJump =  [possibleJumps !! 1 | adjacentOpponent col pos b False && emptySpace b (possibleJumps !! 1)]
+																			possibleJumps = jumps col pos s
 
 --possibleTurns :: Colour -> Position -> Board -> Bool -> [Turn]
 --possibleMoves col pos (Board s ps n) singlemoves
 --	| singlemoves = breakUp 1 (steps col pos s) ++ possibleMoves col
 --	| otherwise = []
+
+between :: Position -> Position -> Colour -> Int -> Int
+between start finish col size | head possibleJumps == finish = head possibleSteps
+															| otherwise = possibleSteps !! 1
+															where
+																possibleJumps = jumps col start size
+																possibleSteps = steps col start size
 
 adjacentOpponent :: Colour -> Position -> Board -> Bool -> Bool
 adjacentOpponent col startPos b@(Board size ps _) left | left = not (emptySpace b (head s)) && (head s, otherColour col) `elem` ps
@@ -147,3 +161,5 @@ breakUp l xs 	| l >= length xs	= [xs]
 positionsOfColour :: Colour -> Board -> [Position]
 positionsOfColour Non board = []
 positionsOfColour colour board = map fst $ filter (\x -> snd x == colour) (pieces board)
+
+jumpBoard = Board 8 [(18,White), (14,Red) ,(15, Red), (5,Red),(7,Red), (32, Red), (23, Red)] 0
