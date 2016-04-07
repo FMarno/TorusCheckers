@@ -27,12 +27,6 @@ data State = State {
 					board :: Board,
 					turn :: Colour
 }
-
-data GameTree = GameTree {
-										gameBoard :: Board,
-										gameTurn :: Colour,
-										nextMoves :: [(Position, GameTree)]
-}
 --------------------------------------------------
 
 possibleTurns :: Colour -> Position -> Board -> [Turn]
