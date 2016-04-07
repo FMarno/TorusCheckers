@@ -36,14 +36,19 @@ data GameTree = GameTree {
 }
 --------------------------------------------------
 
-positionsOfColour :: Colour -> Board -> [Position]
-positionsOfColour Non board = []
-positionsOfColour colour board = map fst $ filter (\x -> snd x == colour) (pieces board)
+--possibleTurns :: Colour -> Position -> Board -> [Turn]
+--possibleTurns col pos b@(Board s ps n) | null jturns = [] --TODO
+--									 | otherwise = jturns 
+--									 where
+--									 	jturns = jumpTurns col pos b
 
---possibleTurns :: Colour -> Position -> Board -> Bool -> [Turn]
---possibleMoves col pos (Board s ps n) singlemoves 
---	| singlemoves = breakUp 1 (steps col pos s) ++ possibleMoves col 
---	| otherwise = []
+jumpTurns :: Colour -> Position -> Board -> [[Position]]
+jumpTurns col pos b@(Board s _ _) =  map (pos : ) (map (\x -> jumpTurns col x b) (jumps col pos s))
+
+adjacentOpponent :: Colour -> Position -> Board -> Bool -> Bool
+adjacentOpponent col startPos b@(Board size ps _) left | left = not (emptySpace (s !! 0) b) && (s !! 0, otherColour col) `elem` ps
+										   | otherwise = not (emptySpace (s !! 1) b) && (s !! 1, otherColour col) `elem` ps
+										   where s = steps col startPos size
 
 emptySpace :: Position -> Board -> Bool
 emptySpace pos (Board _ ps _ ) = not (pos `elem` (map fst ps))
@@ -134,3 +139,7 @@ breakUp :: Int -> [a] -> [[a]]
 breakUp l [] = []
 breakUp l xs 	| l >= length xs	= [xs]
 				| otherwise 		= take l xs : breakUp l (drop l xs)
+
+positionsOfColour :: Colour -> Board -> [Position]
+positionsOfColour Non board = []
+positionsOfColour colour board = map fst $ filter (\x -> snd x == colour) (pieces board)
