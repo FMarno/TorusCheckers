@@ -6,9 +6,7 @@ import           Data.List
 
 type Position = Int
 
-type Turn = [Move]
-
-type Move = (Position, Position)
+type Turn = [Position]
 
 data Colour = White | Red | Non
 	deriving (Eq, Show)
@@ -36,20 +34,25 @@ data GameTree = GameTree {
 }
 --------------------------------------------------
 
-positionsOfColour :: Colour -> Board -> [Position]
-positionsOfColour Non board = []
-positionsOfColour colour board = map fst $ filter (\x -> snd x == colour) (pieces board)
-
 possibleTurns :: Colour -> Position -> Board -> [Turn]
-possibleTurns col pos board | not (null jumpTurns) = jumpTurns
-														| otherwise = singleTurns
-													where
-														jumpTurns = []
-														singleTurns = map (\x -> [(pos,x)]) $ filter (emptySpace board) $ steps col pos (size board)
+possibleTurns col pos b@(Board s ps n) | null jturns = singleTurns
+									 | otherwise = jturns
+									 where
+									 	jturns = jumpTurns col pos b
+										singleTurns = breakUp 1 $ filter (emptySpace b) $ steps col pos s
+
+jumpTurns :: Colour -> Position -> Board -> [[Position]]
+jumpTurns col pos b@(Board s _ _) = undefined
+
 --possibleTurns :: Colour -> Position -> Board -> Bool -> [Turn]
 --possibleMoves col pos (Board s ps n) singlemoves
 --	| singlemoves = breakUp 1 (steps col pos s) ++ possibleMoves col
 --	| otherwise = []
+
+adjacentOpponent :: Colour -> Position -> Board -> Bool -> Bool
+adjacentOpponent col startPos b@(Board size ps _) left | left = not (emptySpace b (head s)) && (head s, otherColour col) `elem` ps
+										   | otherwise = not (emptySpace b (s !! 1)) && (s !! 1, otherColour col) `elem` ps
+										   where s = steps col startPos size
 
 emptySpace :: Board -> Position -> Bool
 emptySpace (Board _ ps _ ) pos = pos `notElem` map fst ps
@@ -140,3 +143,7 @@ breakUp :: Int -> [a] -> [[a]]
 breakUp l [] = []
 breakUp l xs 	| l >= length xs	= [xs]
 				| otherwise 		= take l xs : breakUp l (drop l xs)
+
+positionsOfColour :: Colour -> Board -> [Position]
+positionsOfColour Non board = []
+positionsOfColour colour board = map fst $ filter (\x -> snd x == colour) (pieces board)
