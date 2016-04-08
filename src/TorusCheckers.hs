@@ -30,6 +30,7 @@ data State = State {
 --------------------------------------------------
 
 allMovesOf :: Colour -> Board -> [(Turn, Bool)]
+allMovesOf col (Board _ _ 100) = []
 allMovesOf col b@(Board s ps n) = concatMap (zippish . (\x -> possibleTurns col x b)) (allOf col ps)
 										where
 											zippish (as, bool) = map (\z -> (z, bool)) as
