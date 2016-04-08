@@ -1,6 +1,6 @@
 module Io where
 import           TorusCheckers
-
+-- read the state in
 readState :: IO State
 readState  = do g <- getLine
                 p <- getLine
@@ -8,6 +8,7 @@ readState  = do g <- getLine
                 w <- getLine
                 return (stringsToState g p r w)
 
+-- convert the 4 lines to a state object
 stringsToState :: String -> String -> String -> String -> State
 stringsToState g p r w = State newBoard turn
         where
@@ -20,9 +21,11 @@ stringsToState g p r w = State newBoard turn
           red = words r
           white = words w
 
+-- convert a string into a list representing pieces
 piecesFromString :: Colour -> [String] -> [(Position, Colour)]
 piecesFromString col (x:y:xs) = map (\z -> (read z :: Int, col)) xs
 
+-- print out the final line signifying my move
 printMove :: State -> Turn -> IO()
 printMove (State b@(Board s ps pn) turn) move = print $ "m " ++ show pn ++ (if turn == Red then " 0 " else " 1 ") ++ thing
     where
@@ -32,5 +35,6 @@ printMove (State b@(Board s ps pn) turn) move = print $ "m " ++ show pn ++ (if t
              | otherwise = "0"
       moves = unwords (map show move)
 
+-- would have printed the input for the next move :(
 printState :: IO()
 printState = undefined

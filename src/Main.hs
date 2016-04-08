@@ -4,7 +4,7 @@ import           Io
 import           TorusCheckers
 
 main :: IO ()
-main = do st <- readState
-          let move = makeAlphaBetaPruningMove 100 st
-          uncurry printMove move
-  --printBoard $ board $ makeAlphaBetaPruningMove 100 (State initialBoard  Red)
+main = do st <- readState -- read the state
+          let move = makeAlphaBetaPruningMove 100 st --find the move
+          uncurry printMove move -- print the move
+          -- relax

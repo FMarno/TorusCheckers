@@ -3,7 +3,7 @@ module CheckerTests where
 import           Test.HUnit
 import           TorusCheckers
 
-
+-- these are all unit tests to check that the torus logic works
 tests = TestList $ map TestCase [
     assertEqual "steps from red 6, normal" [9,10] (steps Red 6 8),
     assertEqual "steps from red 2, normal" [6,7] (steps Red 2 8),
@@ -41,7 +41,6 @@ tests = TestList $ map TestCase [
     assertEqual "jump from Red 21" [32,30] (jumps Red 21 8),
     assertEqual "jump from Red 25" [4,2] (jumps Red 25 8),
     assertEqual "jump from Red 30" [5,7] (jumps Red 30 8)
-
     ]
 
 
