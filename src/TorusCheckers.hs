@@ -12,10 +12,10 @@ type Turn = [Position]
 data Colour = White | Red | Non
 	deriving (Eq, Show)
 
-otherColour :: Colour -> Colour
-otherColour White = Red
-otherColour Red = White
-otherColour Non = Non
+other :: Colour -> Colour
+other White = Red
+other Red = White
+other Non = Non
 
 data Board = Board {
 					size :: Int,
@@ -29,37 +29,26 @@ data State = State {
 }
 --------------------------------------------------
 
-possibleTurns :: Colour -> Position -> Board -> [Turn]
-possibleTurns col pos b@(Board s ps n) | null jturns = singleTurns
-									 | otherwise = jturns
+possibleTurns :: Colour -> Position -> Board -> ([Turn], Bool)
+possibleTurns col pos b@(Board s ps n) | null jturns = (singleTurns, True)
+									 | otherwise = (jturns, False)
 									 where
-									 	jturns = jumpTurns col pos b
-										singleTurns = breakUp 1 $ filter (emptySpace b) $ steps col pos s
+									 	jturns = filter (\x -> length x /= 1) $ jumpTurns col pos b
+										singleTurns = map (pos:) $ breakUp 1 $ filter (emptySpace b) $ steps col pos s
 
-jumpTurns :: Colour -> Position -> Board -> [[Position]]
-jumpTurns col pos b@(Board s ps _) | null  validJumps = [[pos]]
- 																	| otherwise = map (pos:) $ concatMap (\x -> jumpTurns col x (removePiece (between pos x col s) $ removePiece pos b)) validJumps
+jumpTurns :: Colour -> Position -> Board -> [Turn]
+jumpTurns col pos b@(Board size ps _) | null  validJumps = [[pos]]
+ 																	| otherwise = map (pos:) $ concatMap (\target -> jumpTurns col target (removePiece (between pos target col size) $ removePiece pos $ addPiece col target b )) validJumps
 																		where
 																			validJumps = lJump ++ rJump
 																			lJump = [head possibleJumps | adjacentOpponent col pos b True && emptySpace b (head possibleJumps)]
 																			rJump =  [possibleJumps !! 1 | adjacentOpponent col pos b False && emptySpace b (possibleJumps !! 1)]
-																			possibleJumps = jumps col pos s
+																			possibleJumps = jumps col pos size
 
---possibleTurns :: Colour -> Position -> Board -> Bool -> [Turn]
---possibleMoves col pos (Board s ps n) singlemoves
---	| singlemoves = breakUp 1 (steps col pos s) ++ possibleMoves col
---	| otherwise = []
-
-between :: Position -> Position -> Colour -> Int -> Int
-between start finish col size | head possibleJumps == finish = head possibleSteps
-															| otherwise = possibleSteps !! 1
-															where
-																possibleJumps = jumps col start size
-																possibleSteps = steps col start size
 
 adjacentOpponent :: Colour -> Position -> Board -> Bool -> Bool
-adjacentOpponent col startPos b@(Board size ps _) left | left = not (emptySpace b (head s)) && (head s, otherColour col) `elem` ps
-										   | otherwise = not (emptySpace b (s !! 1)) && (s !! 1, otherColour col) `elem` ps
+adjacentOpponent col startPos b@(Board size ps _) left | left = not (emptySpace b (head s)) && (head s, other col) `elem` ps
+										   | otherwise = not (emptySpace b (s !! 1)) && (s !! 1, other col) `elem` ps
 										   where s = steps col startPos size
 
 emptySpace :: Board -> Position -> Bool
@@ -100,8 +89,23 @@ steps White pos size
 										 localPos = (pos - 1) `mod` size
 									 	 hsize = size `div` 2
 
-movePiece :: Colour -> Position -> Board -> [Position] -> Board
-movePiece = undefined
+makeMove :: Colour -> (Turn, Bool) -> Board -> Board
+makeMove col (turn, isSingleMove) (Board s ps pn)
+		| isSingleMove = addPiece col (turn !! 1) $ removePiece (head turn) (Board s ps (pn+1))
+		| otherwise = makeJumpMove col turn (Board s ps (pn+1))
+
+makeJumpMove :: Colour -> Turn -> Board -> Board
+makeJumpMove _ [t] b = b
+makeJumpMove col (t:t':ts) b@(Board size _ _) = makeJumpMove col (t':ts) onejump
+	where
+		onejump = removePiece (between t t' col size) $ removePiece t $ addPiece col t' b
+
+between :: Position -> Position -> Colour -> Int -> Int
+between start finish col size | head possibleJumps == finish = head possibleSteps
+															| otherwise = possibleSteps !! 1
+															where
+																possibleJumps = jumps col start size
+																possibleSteps = steps col start size
 
 addPiece :: Colour -> Position -> Board -> Board
 addPiece c p (Board s ps n) = Board s ((p,c) : ps) n
@@ -116,12 +120,16 @@ removePiece p (Board s ps n) = Board s (rP p ps) n
 isColourAt :: Colour -> Position -> Board -> Bool
 isColourAt c p (Board s ps n) = (p,c) `elem` ps
 
-evaluateBoard :: Colour -> Board -> Int
-evaluateBoard c (Board s ps n) = numberOfPieces Red - numberOfPieces White
-						where
-							numberOfPieces :: Colour -> Int
-							numberOfPieces colour = length $ filter (\x -> snd x == colour) ps
+evaluateBoard :: Board -> Int
+evaluateBoard (Board s ps n) = numberOfPieces Red ps - numberOfPieces White ps
 
+findWinner :: Board -> Colour
+findWinner (Board size ps pn) | numberOfPieces Red ps > numberOfPieces White ps = Red
+															| numberOfPieces White ps > numberOfPieces Red ps = White
+															| otherwise = Non
+
+numberOfPieces :: Colour -> [(Position, Colour)] -> Int
+numberOfPieces colour ps = length $ filter (\x -> snd x == colour) ps
 --------------------------------------------------
 
 initialBoard :: Board
