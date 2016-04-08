@@ -1,0 +1,7 @@
+g 8 8 100
+p 25 1
+r 3 29 21 13
+w 1 4
+c white can play the move 4 25 20 9
+c note that this exploits moves from top to bottom of the board
+c and also moves from left side to right, and right side to left

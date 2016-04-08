@@ -1,0 +1,6 @@
+g 8 8 100
+p 0 0
+r 12 1 2 3 4 5 6 7 8 9 10 11 12
+w 12 21 22 23 24 25 26 27 28 29 30 31 32
+An example game file for the initial position on a standard board. No comment character
+is required because all input after the fourth line is ignored.

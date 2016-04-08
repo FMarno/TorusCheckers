@@ -1,7 +1,7 @@
 module CheckerTests where
 
-import Test.HUnit
-import TorusCheckers
+import           Test.HUnit
+import           TorusCheckers
 
 
 tests = TestList $ map TestCase [
