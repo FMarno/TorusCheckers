@@ -130,8 +130,16 @@ isColourAt :: Colour -> Position -> Board -> Bool
 isColourAt c p (Board s ps n) = (p,c) `elem` ps
 
 evaluateBoard :: Colour -> Board -> Int
-evaluateBoard Red (Board s ps n) = numberOfPieces Red ps - numberOfPieces White ps
-evaluateBoard White (Board s ps n) = numberOfPieces White ps - numberOfPieces Red ps
+evaluateBoard Red (Board s ps n) | redPs /= 0 = redPs - whitePs
+																 | otherwise = minBound
+			where
+				redPs = numberOfPieces Red ps
+				whitePs = numberOfPieces White ps
+evaluateBoard White (Board s ps n) | whitePs /= 0 = whitePs - redPs
+																	 | otherwise = minBound
+			where
+				redPs = numberOfPieces Red ps
+				whitePs = numberOfPieces White ps
 
 
 findWinner :: Board -> Colour
