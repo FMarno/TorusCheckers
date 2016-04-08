@@ -1,5 +1,5 @@
 dist/
 *.hi
 *.o
-src/Main
-src/torus-130013466
+Main
+torus-130013466
