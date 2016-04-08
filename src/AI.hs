@@ -1,14 +1,14 @@
 module AI where
 
-import Data.List
-import Data.Ord
-import Debug.Trace
-import Data.Function
-import TorusCheckers
+import           Data.Function
+import           Data.List
+import           Data.Ord
+import           Debug.Trace
+import           TorusCheckers
 
 data GameTree = GameTree {
                     gameBoard :: Board,
-                    gameTurn :: Colour,
+                    gameTurn  :: Colour,
                     nextMoves :: [((Turn, Bool), GameTree)]
                     }
     deriving (Show)
@@ -34,7 +34,6 @@ generateAlphaBetaMoves ::  Board -> Colour -> [(Turn, Bool)]
 generateAlphaBetaMoves  board colour = allMovesOf colour board
 
 --4.----------------------------------------------------------
---TODO here down
 getBestAlphaBetaMove :: Int-> GameTree -> (Turn, Bool)
 getBestAlphaBetaMove depth gameTree = trace (show (gameTurn gameTree) ++ ":" ++ show choice) choice
           where getTurn (t,tree) = t
@@ -43,14 +42,16 @@ getBestAlphaBetaMove depth gameTree = trace (show (gameTurn gameTree) ++ ":" ++ 
 
 --5.----------------------------------------------------------
 
-getTopAlphaBetaMove :: Int -> Colour -> [(Position, GameTree)] -> (Position, GameTree)
-getTopAlphaBetaMove  depth _ [p] = p
-getTopAlphaBetaMove  depth colour pieces = trace (show $ zip (map selectFirst values) (map fst pieces)) choice
+getTopAlphaBetaMove :: Int -> Colour -> [((Turn, Bool), GameTree)] -> ((Turn, Bool), GameTree)
+getTopAlphaBetaMove _ _ [p] = p
+getTopAlphaBetaMove depth colour pieces = trace (show $ zip (map selectFirst values) (map fst pieces)) choice
+-- start with false because its applied to all the first children
    where values = map (\(_, tree) -> alphaBetaPruning  depth colour False tree (minBound, maxBound)) pieces
+   -- find the value of the node with the highest alpha value
          choice = fst $ maximumBy (compare `on` snd) $ zip pieces values
 
 --6.----------------------------------------------------------
-
+--TODO here Down
 alphaBetaPruning ::  Int -> Colour -> Bool -> GameTree -> (Int, Int) -> (Int,Int,Int)
 alphaBetaPruning  depth colour maxPlayer (GameTree board turn []) (alpha, beta) = (evaluateBoard colour board, alpha, beta)
 alphaBetaPruning  0 colour maxPlayer (GameTree board turn _) (alpha, beta) = (evaluateBoard colour board, alpha, beta)
