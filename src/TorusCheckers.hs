@@ -29,6 +29,11 @@ data State = State {
 }
 --------------------------------------------------
 
+allMovesOf :: Colour -> Board -> [(Turn, Bool)]
+allMovesOf col b@(Board s ps n) = concatMap (zippish . (\x -> possibleTurns col x b)) (allOf col ps)
+										where
+											zippish (as, bool) = map (\z -> (z, bool)) as
+
 possibleTurns :: Colour -> Position -> Board -> ([Turn], Bool)
 possibleTurns col pos b@(Board s ps n) | null jturns = (singleTurns, True)
 									 | otherwise = (jturns, False)
@@ -37,13 +42,14 @@ possibleTurns col pos b@(Board s ps n) | null jturns = (singleTurns, True)
 										singleTurns = map (pos:) $ breakUp 1 $ filter (emptySpace b) $ steps col pos s
 
 jumpTurns :: Colour -> Position -> Board -> [Turn]
-jumpTurns col pos b@(Board size ps _) | null  validJumps = [[pos]]
- 																	| otherwise = map (pos:) $ concatMap (\target -> jumpTurns col target (removePiece (between pos target col size) $ removePiece pos $ addPiece col target b )) validJumps
-																		where
-																			validJumps = lJump ++ rJump
-																			lJump = [head possibleJumps | adjacentOpponent col pos b True && emptySpace b (head possibleJumps)]
-																			rJump =  [possibleJumps !! 1 | adjacentOpponent col pos b False && emptySpace b (possibleJumps !! 1)]
-																			possibleJumps = jumps col pos size
+jumpTurns col pos b@(Board size ps _)
+			| null  validJumps = [[pos]]
+			| otherwise = map (pos:) $ concatMap (\target -> jumpTurns col target (removePiece (between pos target col size) $ removePiece pos $ addPiece col target b )) validJumps
+			where
+				validJumps = lJump ++ rJump
+				lJump = [head possibleJumps | adjacentOpponent col pos b True && emptySpace b (head possibleJumps)]
+				rJump =  [possibleJumps !! 1 | adjacentOpponent col pos b False && emptySpace b (possibleJumps !! 1)]
+				possibleJumps = jumps col pos size
 
 
 adjacentOpponent :: Colour -> Position -> Board -> Bool -> Bool
@@ -130,6 +136,9 @@ findWinner (Board size ps pn) | numberOfPieces Red ps > numberOfPieces White ps 
 
 numberOfPieces :: Colour -> [(Position, Colour)] -> Int
 numberOfPieces colour ps = length $ filter (\x -> snd x == colour) ps
+
+allOf :: Colour -> [(Position, Colour)]-> [Position]
+allOf colour ps = map fst $ filter (\x -> snd x == colour) ps
 --------------------------------------------------
 
 initialBoard :: Board
