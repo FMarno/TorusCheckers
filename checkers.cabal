@@ -5,7 +5,7 @@ name:                checkers
 version:             0.1.0.0
 synopsis:            a game of checkers with no kings and in a torus
 -- description:
-homepage:            https://github.com/FMarno/TorusCheckers
+homepage:
 -- license:
 license-file:        LICENSE
 author:              fsm
@@ -17,6 +17,6 @@ cabal-version:       >=1.8
 
 executable checkers
   main-is:             Main.hs
-  other-modules:       TorusCheckers 
+  other-modules:       TorusCheckers, AI
   build-depends:       base ==4.6.*, HUnit ==1.2.*
   hs-source-dirs:      src

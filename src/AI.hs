@@ -35,7 +35,7 @@ generateAlphaBetaMoves  board colour = allMovesOf colour board
 
 --4.----------------------------------------------------------
 getBestAlphaBetaMove :: Int-> GameTree -> (Turn, Bool)
-getBestAlphaBetaMove depth gameTree = trace (show (gameTurn gameTree) ++ ":" ++ show choice) choice
+getBestAlphaBetaMove depth gameTree = choice --trace (show (gameTurn gameTree) ++ ":" ++ show choice) choice
           where getTurn (t,tree) = t
                 choice = getTurn $ getTopAlphaBetaMove depth (gameTurn gameTree) (nextMoves gameTree)
 
@@ -44,7 +44,7 @@ getBestAlphaBetaMove depth gameTree = trace (show (gameTurn gameTree) ++ ":" ++ 
 
 getTopAlphaBetaMove :: Int -> Colour -> [((Turn, Bool), GameTree)] -> ((Turn, Bool), GameTree)
 getTopAlphaBetaMove _ _ [p] = p
-getTopAlphaBetaMove depth colour pieces = trace (show $ zip (map selectFirst values) (map fst pieces)) choice
+getTopAlphaBetaMove depth colour pieces = choice --trace (show $ zip (map selectFirst values) (map fst pieces)) choice
 -- start with false because its applied to all the first children
    where values = map (\(_, tree) -> alphaBetaPruning  depth colour False tree (minBound, maxBound)) pieces
    -- find the value of the node with the highest alpha value
