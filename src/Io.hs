@@ -21,10 +21,16 @@ stringsToState g p r w = State newBoard turn
           white = words w
 
 piecesFromString :: Colour -> [String] -> [(Position, Colour)]
-piecesFromString col (x:xs) = map (\z -> (read z :: Int, col)) xs
+piecesFromString col (x:y:xs) = map (\z -> (read z :: Int, col)) xs
 
-printMove :: IO()
-printMove = undefined
+printMove :: State -> Turn -> IO()
+printMove (State b@(Board s ps pn) turn) move = print $ "m " ++ show pn ++ (if turn == Red then " 0 " else " 1 ") ++ thing
+    where
+      thing = if null move then "0 " ++ winner else moves
+      winner | findWinner b == turn = "1"
+             | findWinner b == other turn = "-1"
+             | otherwise = "0"
+      moves = unwords (map show move)
 
 printState :: IO()
 printState = undefined

@@ -14,11 +14,13 @@ data GameTree = GameTree {
     deriving (Show)
 
 --1.----------------------------------------------------------
-makeAlphaBetaPruningMove :: Int -> State -> State
-makeAlphaBetaPruningMove depth (State b@(Board size ps play) turn)
-   = State newBoard (other turn)
+makeAlphaBetaPruningMove :: Int -> State -> (State, Turn)
+makeAlphaBetaPruningMove depth s@(State b@(Board size ps play) turn)
+   | null nextMove = (s, [])
+   | otherwise = (State newBoard (other turn), fst bestMove)
     where newBoard = makeMove turn bestMove b
           bestMove = getBestAlphaBetaMove depth $ buildAlphaBetaTree generateAlphaBetaMoves b turn
+          nextMove = generateAlphaBetaMoves b turn
 
 --2.----------------------------------------------------------
 buildAlphaBetaTree :: (Board -> Colour -> [(Turn, Bool)])-> Board -> Colour -> GameTree

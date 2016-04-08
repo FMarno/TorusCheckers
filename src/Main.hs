@@ -5,5 +5,6 @@ import           TorusCheckers
 
 main :: IO ()
 main = do st <- readState
-          printBoard $ board st
+          let move = makeAlphaBetaPruningMove 100 st
+          uncurry printMove move
   --printBoard $ board $ makeAlphaBetaPruningMove 100 (State initialBoard  Red)
