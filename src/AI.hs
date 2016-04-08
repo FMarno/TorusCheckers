@@ -9,41 +9,33 @@ import TorusCheckers
 data GameTree = GameTree {
                     gameBoard :: Board,
                     gameTurn :: Colour,
-                    nextMoves :: [(Position, GameTree)]
+                    nextMoves :: [((Turn, Bool), GameTree)]
                     }
     deriving (Show)
 
 --1.----------------------------------------------------------
-
 makeAlphaBetaPruningMove :: State -> State
 makeAlphaBetaPruningMove (State b@(Board size ps play) turn)
    = State newBoard (other turn)
-    where newBoard = makeMove b bestMove
+    where newBoard = makeMove bestMove b
           bestMove = getBestAlphaBetaMove 5 $ buildAlphaBetaTree generateAlphaBetaMoves b turn
 
 --2.----------------------------------------------------------
-
-buildAlphaBetaTree :: (Board -> Colour -> [Position])-> Board -> Colour -> GameTree
-buildAlphaBetaTree generate  board colour =
-    let moves = generate  board colour in GameTree board colour (makeNextStates moves)
+buildAlphaBetaTree :: (Board -> Colour -> [(Turn, Bool)])-> Board -> Colour -> GameTree
+buildAlphaBetaTree generate board colour =
+    let moves = generate board colour in GameTree board colour (makeNextStates moves)
   where
-    makeNextStates :: [Position] -> [(Position, GameTree)]
-    makeNextStates [] = []
-    makeNextStates (position:positions)
-        = case makeMove  board colour position of
-               Nothing -> makeNextStates positions
-               Just newBoard -> (position, buildAlphaBetaTree generate  newBoard (other colour))
-                                  : makeNextStates positions
+    makeNextStates :: [(Turn, Bool)] -> [((Turn, Bool), GameTree)]
+    makeNextStates = map (\t -> (t, buildAlphaBetaTree generate (makeMove colour t board) (other colour)))
 
 --3.----------------------------------------------------------
 
-generateAlphaBetaMoves ::  Board -> Colour -> [Turn]
-generateAlphaBetaMoves  board colour = undefined
-
+generateAlphaBetaMoves ::  Board -> Colour -> [(Turn, Bool)]
+generateAlphaBetaMoves  board colour = allMovesOf colour board
 
 --4.----------------------------------------------------------
-
-getBestAlphaBetaMove :: Int-> GameTree -> Turn
+--TODO here down
+getBestAlphaBetaMove :: Int-> GameTree -> (Turn, Bool)
 getBestAlphaBetaMove depth gameTree = trace (show (gameTurn gameTree) ++ ":" ++ show choice) choice
           where getTurn (t,tree) = t
                 choice = getTurn $ getTopAlphaBetaMove depth (gameTurn gameTree) (nextMoves gameTree)
