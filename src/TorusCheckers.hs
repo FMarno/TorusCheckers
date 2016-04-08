@@ -26,7 +26,7 @@ data Board = Board {
 data State = State {
 					board :: Board,
 					turn :: Colour
-}
+} deriving (Show)
 --------------------------------------------------
 
 allMovesOf :: Colour -> Board -> [(Turn, Bool)]
