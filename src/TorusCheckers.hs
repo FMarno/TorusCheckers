@@ -95,10 +95,12 @@ steps White pos size
 										 localPos = (pos - 1) `mod` size
 									 	 hsize = size `div` 2
 
+--RED MOVES FIRST
 makeMove :: Colour -> (Turn, Bool) -> Board -> Board
 makeMove col (turn, isSingleMove) (Board s ps pn)
-		| isSingleMove = addPiece col (turn !! 1) $ removePiece (head turn) (Board s ps (pn+1))
-		| otherwise = makeJumpMove col turn (Board s ps (pn+1))
+		| isSingleMove = addPiece col (turn !! 1) $ removePiece (head turn) (Board s ps newPn)
+		| otherwise = makeJumpMove col turn (Board s ps newPn)
+		where newPn = if col == White then pn+1 else pn
 
 makeJumpMove :: Colour -> Turn -> Board -> Board
 makeJumpMove _ [t] b = b
