@@ -39,5 +39,8 @@ printMove (State b@(Board s ps pn) turn) move = putStrLn $ "m " ++ show pn ++ (i
 printState :: State -> IO()
 printState (State (Board s ps pn) turn) = do putStrLn "g 8 8 100"
                                              putStrLn $ "p " ++ show pn ++ (if turn == Red then " 0" else " 1")
-                                             putStrLn $ "r " ++ unwords (map (show . fst) $ filter (\z -> snd z == Red) ps)
-                                             putStrLn $ "w " ++ unwords (map (show . fst) $ filter (\z -> snd z == White) ps)
+                                             putStrLn $ "r " ++ show ( length reds) ++ " " ++ unwords reds
+                                             putStrLn $ "w " ++ show ( length whites) ++ " " ++ unwords whites
+                                             where
+                                              reds = map (show . fst) $ filter (\z -> snd z == Red) ps
+                                              whites = map (show . fst) $ filter (\z -> snd z == White) ps
