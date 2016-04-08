@@ -14,11 +14,11 @@ data GameTree = GameTree {
     deriving (Show)
 
 --1.----------------------------------------------------------
-makeAlphaBetaPruningMove :: State -> State
-makeAlphaBetaPruningMove (State b@(Board size ps play) turn)
+makeAlphaBetaPruningMove :: Int -> State -> State
+makeAlphaBetaPruningMove depth (State b@(Board size ps play) turn)
    = State newBoard (other turn)
-    where newBoard = makeMove bestMove b
-          bestMove = getBestAlphaBetaMove 5 $ buildAlphaBetaTree generateAlphaBetaMoves b turn
+    where newBoard = makeMove turn bestMove b
+          bestMove = getBestAlphaBetaMove depth $ buildAlphaBetaTree generateAlphaBetaMoves b turn
 
 --2.----------------------------------------------------------
 buildAlphaBetaTree :: (Board -> Colour -> [(Turn, Bool)])-> Board -> Colour -> GameTree
@@ -53,35 +53,37 @@ getTopAlphaBetaMove depth colour pieces = trace (show $ zip (map selectFirst val
 --6.----------------------------------------------------------
 --TODO here Down
 alphaBetaPruning ::  Int -> Colour -> Bool -> GameTree -> (Int, Int) -> (Int,Int,Int)
-alphaBetaPruning  depth colour maxPlayer (GameTree board turn []) (alpha, beta) = (evaluateBoard colour board, alpha, beta)
-alphaBetaPruning  0 colour maxPlayer (GameTree board turn _) (alpha, beta) = (evaluateBoard colour board, alpha, beta)
-alphaBetaPruning  depth colour maxPlayer (GameTree board game_turn moves) (alpha, beta)
-       | checkWon board == colour
-          = (100 , alpha, beta)
-       | checkWon board == other colour
-          = (-100, alpha, beta)
-       | otherwise
+alphaBetaPruning  _ colour _ (GameTree board _ []) (alpha, beta) = (evaluateBoard colour board, alpha, beta)
+alphaBetaPruning  0 colour _ (GameTree board _ _) (alpha, beta) = (evaluateBoard colour board, alpha, beta)
+alphaBetaPruning  depth colour maxPlayer (GameTree _ _ moves) (alpha, beta)
           = h
           where (treeOfMoves : allOtherPossibleMoves) = map treeOf moves
                 treeOf (p,tree) = tree
-                valueOfFirstOppselectFirstntChild = alphaBetaPruning  (depth-1) colour (not maxPlayer) treeOfMoves (alpha,beta)
-                h = foldl' (accumulate  depth colour maxPlayer) valueOfFirstOppselectFirstntChild allOtherPossibleMoves
+                valueOfFirstOppSelectFirstntChild = alphaBetaPruning  (depth-1) colour (not maxPlayer) treeOfMoves (alpha,beta)
+                h = foldl' (accumulate  depth colour maxPlayer) valueOfFirstOppSelectFirstntChild allOtherPossibleMoves
 
-accumulate ::  Int-> Colour-> Bool -> (Int, Int, Int) -> GameTree -> (Int, Int, Int)
+accumulate ::  Int-> Colour -> Bool -> (Int, Int, Int) -> GameTree -> (Int, Int, Int)
 accumulate  depth colour maxPlayer input@(value, alpha, beta) gameTree
    | beta <= alpha = input
    | otherwise     = (v, newalpha, newbeta)
       where operator
               | maxPlayer = max
               | otherwise = min
-            v = operator newh value
+            v = operator value newh
             (newh, newa, newb) = alphaBetaPruning (depth-1) colour (not maxPlayer) gameTree (alpha, beta)
             newalpha
-              | maxPlayer = operator v newa
+              | maxPlayer = operator alpha v
               | otherwise = alpha
             newbeta
               | maxPlayer = beta
-              | otherwise = operator v newb
+              | otherwise = operator beta v
 
 selectFirst :: (Int, Int,Int) -> Int
 selectFirst (a,b,c) = a
+
+--------------------
+-- | checkWon board == colour
+--   = (100 , alpha, beta)
+-- | checkWon board == other colour
+--   = (-100, alpha, beta)
+-- | otherwise

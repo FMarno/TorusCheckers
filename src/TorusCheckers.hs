@@ -129,8 +129,10 @@ removePiece p (Board s ps n) = Board s (rP p ps) n
 isColourAt :: Colour -> Position -> Board -> Bool
 isColourAt c p (Board s ps n) = (p,c) `elem` ps
 
-evaluateBoard :: Board -> Int
-evaluateBoard (Board s ps n) = numberOfPieces Red ps - numberOfPieces White ps
+evaluateBoard :: Colour -> Board -> Int
+evaluateBoard Red (Board s ps n) = numberOfPieces Red ps - numberOfPieces White ps
+evaluateBoard White (Board s ps n) = numberOfPieces White ps - numberOfPieces Red ps
+
 
 findWinner :: Board -> Colour
 findWinner (Board size ps pn) | numberOfPieces Red ps > numberOfPieces White ps = Red
