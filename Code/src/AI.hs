@@ -3,9 +3,10 @@ module AI where
 import           Data.Function
 import           Data.List
 import           Data.Ord
+import           Debug.Trace
 import           TorusCheckers
 
--- recursive structure that lazily represents all possible game states 
+-- recursive structure that lazily represents all possible game states
 data GameTree = GameTree {
                     gameBoard :: Board,
                     gameTurn  :: Colour,
@@ -40,51 +41,35 @@ generateAlphaBetaMoves  board colour = allMovesOf colour board
 --4.----------------------------------------------------------
 --remove the wanted information from the getTopAlphaBetaMove function
 getBestAlphaBetaMove :: Int-> GameTree -> (Turn, Bool)
-getBestAlphaBetaMove depth gameTree = choice
+getBestAlphaBetaMove depth gameTree = trace ("choice " ++ show choice) choice
           where getTurn (t,tree) = t
                 choice = getTurn $ getTopAlphaBetaMove depth (gameTurn gameTree) (nextMoves gameTree)
 
 
 --5.----------------------------------------------------------
 --read the max move from first layer of children
-getTopAlphaBetaMove :: Int -> Colour -> [((Turn, Bool), GameTree)] -> ((Turn, Bool), GameTree)
-getTopAlphaBetaMove _ _ [p] = p
-getTopAlphaBetaMove depth colour pieces = choice
--- start with false because its applied to all the first children
-   where values = map (\(_, tree) -> alphaBetaPruning  depth colour False tree (minBound, maxBound)) pieces
-   -- find the value of the node with the highest alpha value
-         choice = fst $ maximumBy (compare `on` snd) $ zip pieces values
+getTopAlphaBetaMove :: Int -> Colour -> [((Turn, Bool), GameTree)] -> ((Turn, Bool), Int)
+getTopAlphaBetaMove _ _ [p] = (fst p, 0)
+getTopAlphaBetaMove depth colour gameTree = maximumBy (compare `on` snd) (trace (show choices ++ " " ++ show colour) choices)
+                                  where choices = zip (map fst gameTree) $ map (\turn -> alphaBetaPruning (depth-1) colour False turn (minBound, maxBound)) $ (map snd gameTree)
 
 --6.----------------------------------------------------------
-alphaBetaPruning ::  Int -> Colour -> Bool -> GameTree -> (Int, Int) -> (Int,Int,Int)
+alphaBetaPruning ::  Int -> Colour -> Bool -> GameTree -> (Int, Int) -> Int
 -- no available moves from this part
-alphaBetaPruning _ colour _ (GameTree board _ []) (alpha, beta) = (evaluateBoard colour board, alpha, beta)
--- reached the bottom depth
-alphaBetaPruning 0 colour _ (GameTree board _ _) (alpha, beta) = (evaluateBoard colour board, alpha, beta)
+alphaBetaPruning _ aiColour _ (GameTree board _ []) _ = evaluateBoard aiColour board
+-- reached search depth
+alphaBetaPruning 0 aiColour _ (GameTree board _ _) _ = evaluateBoard aiColour board
 -- evaluate a node
-alphaBetaPruning depth colour maxPlayer (GameTree _ _ moves) (alpha, beta)
-          = h
-          where (treeOfMoves : allOtherPossibleMoves) = map treeOf moves
-                treeOf (p,tree) = tree
-                valueOfFirstOppSelectFirstntChild = alphaBetaPruning  (depth-1) colour (not maxPlayer) treeOfMoves (alpha,beta)
-                h = foldl' (accumulate  depth colour maxPlayer) valueOfFirstOppSelectFirstntChild allOtherPossibleMoves
+alphaBetaPruning depth aiColour True (GameTree board _ [next]) (alpha, beta) = alphaBetaPruning (depth-1) aiColour False (snd next) (alpha,beta)
+alphaBetaPruning depth aiColour True (GameTree board col (next:moves)) (alpha, beta) =
+   if nextAlpha >= beta then nextAlpha else
+      alphaBetaPruning depth aiColour True (GameTree board col moves) (nextAlpha,beta)
+    where value = alphaBetaPruning (depth-1) aiColour False (snd next) (alpha,beta)
+          nextAlpha = max value alpha
 
---a special type of fold that runs until the break of beta <= alpha
-accumulate ::  Int-> Colour -> Bool -> (Int, Int, Int) -> GameTree -> (Int, Int, Int)
-accumulate  depth colour maxPlayer input@(value, alpha, beta) gameTree
-   | beta <= alpha = input
-   | otherwise     = (v, newalpha, newbeta)
-      where operator
-              | maxPlayer = max
-              | otherwise = min
-            v = operator value newh
-            (newh, newa, newb) = alphaBetaPruning (depth-1) colour (not maxPlayer) gameTree (alpha, beta)
-            newalpha
-              | maxPlayer = operator alpha v
-              | otherwise = alpha
-            newbeta
-              | maxPlayer = beta
-              | otherwise = operator beta v
-
-selectFirst :: (Int, Int,Int) -> Int
-selectFirst (a,b,c) = a
+alphaBetaPruning depth aiColour False (GameTree board _ [next]) (alpha, beta) = alphaBetaPruning (depth-1) aiColour True (snd next) (alpha,beta)
+alphaBetaPruning depth aiColour False (GameTree board col (next:moves)) (alpha, beta) =
+   if alpha >= nextBeta then nextBeta else
+      alphaBetaPruning depth aiColour False (GameTree board col moves) (alpha,nextBeta)
+    where value = alphaBetaPruning (depth-1) aiColour True (snd next) (alpha,beta)
+          nextBeta = min value beta
