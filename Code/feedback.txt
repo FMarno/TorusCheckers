@@ -1,0 +1,22 @@
+Good work let down by a major bug and weak report.
+
+
+You don't correctly implement the rule that captures must be taken if
+available. E.g. in the following position you give the move 11 15 which is
+a possible move but is illegal because the capture can be made from 13 to 22,
+capturing square 17.
+
+g 8 8 100
+p 1 0
+r 12 1 2 3 4 9 6 7 8 10 11 12 13
+w 12 17 21 23 24 25 26 27 28 29 30 31 32
+
+The format you print for moves is wrong in a couple of ways. First there are
+are unnecessary quotes in the print, and second the move is incremented and it
+was meant to print out the current move number. (I fixed these in order to
+test the program against my random player and it was then I found the bug
+mentioned above.)
+
+The report is very brief, so give very little on design decisions or
+discussion of how your program plays. It would be good for example to see a
+game it played against itself.

@@ -33,8 +33,9 @@ data State = State {
 -- false if its a jump
 allMovesOf :: Colour -> Board -> [(Turn, Bool)]
 allMovesOf col (Board _ _ 100) = []
-allMovesOf col b@(Board s ps n) = concatMap (zippish . (\x -> possibleTurns col x b)) (allOf col ps)
+allMovesOf col b@(Board s ps n) = if elem False (map snd $ piecesMoves) then filter (\x -> not $ snd x) piecesMoves else piecesMoves
 										where
+											piecesMoves = concatMap (zippish . (\x -> possibleTurns col x b)) (allOf col ps)
 											zippish (as, bool) = map (\z -> (z, bool)) as
 
 -- find all the possible turns from a position for a colour
