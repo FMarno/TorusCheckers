@@ -1,0 +1,184 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\usepackage{indentfirst}\usepackage{url}\usepackage[parfill]{parskip}
+\usepackage{fancyhdr}
+
+\fancyhead[R]{Practical 1}
+\fancyhead[C]{Mat.: 130013466}
+\fancyhead[L]{CS 3052 }
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding auto
+\fontencoding default
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks false
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref section
+\pdf_pdfusetitle false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 0
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine natbib
+\cite_engine_type authoryear
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle fancy
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+CS3105 Practical 2: Torus Checkers
+\end_layout
+
+\begin_layout Author
+130013466
+\end_layout
+
+\begin_layout Abstract
+The aim of the practice was to implement the game logic a version of checkers
+ called Torus checkers, in which there were no kings and the board wrapped
+ around as in a torus.
+ A Alpha Beta MiniMax search tree was then constructed to give moves given
+ a state to play from.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Introduction
+\end_layout
+
+\begin_layout Standard
+This was a challenging yet fun practical.
+ Most of the requirements were met but not all.
+ The basic requirement to put a time limit on the computation of the was
+ not implemented but luckily the program ran very fast so it isn't really
+ needed to get below five seconds in any case.
+\end_layout
+
+\begin_layout Part
+Design and Implementation
+\end_layout
+
+\begin_layout Standard
+As the nature of the program was to give and input and receive an output
+ with no side effects, except the IO, it seemed obvious that this problem
+ would be well suited to a functional language.
+ The lazy evaluation of Haskell also seemed like it would suit itself very
+ well to the MiniMax algorithm since the whole search tree could be defined
+ but only the required states would actually be evaluated with little effort
+ from the programmer.
+ The program is split into IO, AI, and Game logic.
+ Thanks to these choices the program ran extremely fast at deep depths.
+ 
+\end_layout
+
+\begin_layout Part
+Testing
+\end_layout
+
+\begin_layout Standard
+For the logic of the torus positions I used hunit tests provided in CheckersTest
+s.hs.
+ This was very useful while working with quite confusing code and has given
+ me confidence that it works correctly.
+ For all other mechanic I tested them manually multiple times but they were
+ all far more manageable.
+ The only part with dubious testing would be the AI as the basic opponent
+ provided was too simple and running it against itself seemed pointless
+ because potential bugs they both contained could go unnoticed quite easily.
+ Though the efficacy of the AI is doubted the validity of the outputted
+ moves seems concrete.
+\end_layout
+
+\begin_layout Part
+Evaluation
+\end_layout
+
+\begin_layout Standard
+Unfortunately implementing the game logic was quite time consuming so after
+ the AI was finally written there was no time to create a more sophisticated
+ evaluation function.
+ Thankfully the program can easily run at a deep depth so it still play
+ reasonably well due to how far it can look ahead.
+ In some ways this allows it to basically run as a Monte-Carlo search tree
+ but with a slightly odd evaluation.
+\end_layout
+
+\begin_layout Part*
+Note
+\end_layout
+
+\begin_layout Standard
+I would like to enter the competition.
+ If you need me to write a function to print out the next state then feel
+ free to email me to ask.
+\end_layout
+
+\end_body
+\end_document

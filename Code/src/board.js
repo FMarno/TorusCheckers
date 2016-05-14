@@ -1,3 +1,5 @@
+//just a little file to print out boards of different sizes for
+//visualisation
 size = parseInt(process.argv[2]);
 odd = true;
 
