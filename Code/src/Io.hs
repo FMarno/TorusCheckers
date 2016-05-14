@@ -27,7 +27,7 @@ piecesFromString col (x:y:xs) = map (\z -> (read z :: Int, col)) xs
 
 -- print out the final line signifying my move
 printMove :: State -> Turn -> IO()
-printMove (State b@(Board s ps pn) turn) move = print $ "m " ++ show pn ++ (if turn == Red then " 0 " else " 1 ") ++ thing
+printMove (State b@(Board s ps pn) turn) move = putStrLn $ "m " ++ show pn ++ (if turn == Red then " 0 " else " 1 ") ++ thing
     where
       thing = if null move then "0 " ++ winner else moves
       winner | findWinner b == turn = "1"
@@ -36,5 +36,11 @@ printMove (State b@(Board s ps pn) turn) move = print $ "m " ++ show pn ++ (if t
       moves = unwords (map show move)
 
 -- would have printed the input for the next move :(
-printState :: IO()
-printState = undefined
+printState :: State -> IO()
+printState (State (Board s ps pn) turn) = do putStrLn "g 8 8 100"
+                                             putStrLn $ "p " ++ show pn ++ (if turn == Red then " 0" else " 1")
+                                             putStrLn $ "r " ++ show ( length reds) ++ " " ++ unwords reds
+                                             putStrLn $ "w " ++ show ( length whites) ++ " " ++ unwords whites
+                                             where
+                                              reds = map (show . fst) $ filter (\z -> snd z == Red) ps
+                                              whites = map (show . fst) $ filter (\z -> snd z == White) ps
