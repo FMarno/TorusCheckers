@@ -3,7 +3,6 @@ module AI where
 import           Data.Function
 import           Data.List
 import           Data.Ord
-import           Debug.Trace
 import           TorusCheckers
 
 -- recursive structure that lazily represents all possible game states
@@ -41,16 +40,14 @@ generateAlphaBetaMoves  board colour = allMovesOf colour board
 --4.----------------------------------------------------------
 --remove the wanted information from the getTopAlphaBetaMove function
 getBestAlphaBetaMove :: Int-> GameTree -> (Turn, Bool)
-getBestAlphaBetaMove depth gameTree = trace ("choice " ++ show choice) choice
-          where getTurn (t,tree) = t
-                choice = getTurn $ getTopAlphaBetaMove depth (gameTurn gameTree) (nextMoves gameTree)
+getBestAlphaBetaMove depth gameTree = fst $ getTopAlphaBetaMove depth (gameTurn gameTree) (nextMoves gameTree)
 
 
 --5.----------------------------------------------------------
 --read the max move from first layer of children
 getTopAlphaBetaMove :: Int -> Colour -> [((Turn, Bool), GameTree)] -> ((Turn, Bool), Int)
 getTopAlphaBetaMove _ _ [p] = (fst p, 0)
-getTopAlphaBetaMove depth colour gameTree = maximumBy (compare `on` snd) (trace (show choices ++ " " ++ show colour) choices)
+getTopAlphaBetaMove depth colour gameTree = maximumBy (compare `on` snd) choices
                                   where choices = zip (map fst gameTree) $ map (\turn -> alphaBetaPruning (depth-1) colour False turn (minBound, maxBound)) $ (map snd gameTree)
 
 --6.----------------------------------------------------------

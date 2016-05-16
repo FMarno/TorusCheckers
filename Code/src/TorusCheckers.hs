@@ -9,8 +9,7 @@ type Position = Int
 
 type Turn = [Position]
 
-data Colour = White | Red | Non
-	deriving (Eq, Show)
+data Colour = White | Red | Non deriving (Eq, Show)
 
 other :: Colour -> Colour
 other White = Red
@@ -18,14 +17,14 @@ other Red = White
 other Non = Non
 
 data Board = Board {
-					size :: Int,
-					pieces :: [(Position, Colour)],
-					playNum :: Int
+  size    :: Int,
+  pieces  :: [(Position, Colour)],
+  playNum :: Int
 } deriving (Show)
 
 data State = State {
-					board :: Board,
-					turn :: Colour
+  board :: Board,
+  turn  :: Colour
 } deriving (Show)
 --------------------------------------------------
 -- find all the possible move available for a colour
