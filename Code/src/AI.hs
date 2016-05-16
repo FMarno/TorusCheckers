@@ -63,13 +63,13 @@ alphaBetaPruning 0 aiColour _ (GameTree board _ _) _ = evaluateBoard aiColour bo
 alphaBetaPruning depth aiColour True (GameTree board _ [next]) (alpha, beta) = alphaBetaPruning (depth-1) aiColour False (snd next) (alpha,beta)
 alphaBetaPruning depth aiColour True (GameTree board col (next:moves)) (alpha, beta) =
    if nextAlpha >= beta then nextAlpha else
-      alphaBetaPruning depth aiColour True (GameTree board col moves) (nextAlpha,beta)
+      max value $ alphaBetaPruning depth aiColour True (GameTree board col moves) (nextAlpha,beta)
     where value = alphaBetaPruning (depth-1) aiColour False (snd next) (alpha,beta)
           nextAlpha = max value alpha
 
 alphaBetaPruning depth aiColour False (GameTree board _ [next]) (alpha, beta) = alphaBetaPruning (depth-1) aiColour True (snd next) (alpha,beta)
 alphaBetaPruning depth aiColour False (GameTree board col (next:moves)) (alpha, beta) =
    if alpha >= nextBeta then nextBeta else
-      alphaBetaPruning depth aiColour False (GameTree board col moves) (alpha,nextBeta)
+      min value $ alphaBetaPruning depth aiColour False (GameTree board col moves) (alpha,nextBeta)
     where value = alphaBetaPruning (depth-1) aiColour True (snd next) (alpha,beta)
           nextBeta = min value beta
